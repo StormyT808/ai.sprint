@@ -1,7 +1,9 @@
 let balls = [];
 
 function setup() {
-  createCanvas(600, 400);
+  document.body.style.margin = '0';
+  document.body.style.overflow = 'hidden';
+  createCanvas(windowWidth, windowHeight);
   balls.push({
     x: width / 2, y: height / 2,
     vx: random(-3, 3), vy: random(-3, 3),
@@ -24,7 +26,7 @@ function draw() {
     if (b.x < 0 || b.x > width) { b.vx *= -1; hitWall = true; }
     if (b.y < 0 || b.y > height) { b.vy *= -1; hitWall = true; }
 
-    if (hitWall && balls.length < 80 && b.size > 8) {
+    if (hitWall && balls.length < 800 && b.size > 8) {
       balls.splice(i, 1);
       for (let j = 0; j < 2; j++) {
         balls.push({
@@ -41,3 +43,27 @@ function draw() {
       circle(b.x, b.y, b.size);
     }
   }
+
+  // Ball-to-ball collision - swap speeds + change color
+  for (let i = 0; i < balls.length; i++) {
+    for (let j = i + 1; j < balls.length; j++) {
+      let b1 = balls[i];
+      let b2 = balls[j];
+      let d = dist(b1.x, b1.y, b2.x, b2.y);
+      if (d < (b1.size + b2.size) / 2 && d > 0) {
+        let tempVx = b1.vx, tempVy = b1.vy;
+        b1.vx = b2.vx; b1.vy = b2.vy;
+        b2.vx = tempVx; b2.vy = tempVy;
+        b1.r = random(100, 255); b1.g = random(100, 255); b1.b = random(100, 255);
+      }
+    }
+  }
+}
+function mousePressed() {
+  // click to go fullscreen
+  let fs = fullscreen();
+  fullscreen(!fs);
+}
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
